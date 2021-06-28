@@ -26,4 +26,15 @@ rpc.exports = {
 }
 ```
 
-Then we can just call the script to run over the obfuscated strings `cat strings.txt | python piper.py`.
+Then we can just call the script to run over the obfuscated strings `cat strings.txt | python piper.py --script piper.js`.
+
+
+## Known issues
+
+The main `piper.py` script tries to filter out any non printable characters in order to keep the output clean:
+
+```
+        if is_ascii(message['payload']) and message['payload'].isprintable() and len(message['payload'])>1:
+```
+
+Use `console.log()` on the frida script to bypass this filter or just comment that line out.

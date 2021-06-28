@@ -4,6 +4,7 @@ import os
 import sys
 import click
 import logging
+import argparse
 
 logging.basicConfig(level=logging.INFO,
                     format="%(asctime)s %(levelname)s %(message)s",
@@ -22,6 +23,12 @@ def on_message(message, data):
     except: 
         pass
 
+# args
+parser = argparse.ArgumentParser(prog='frida-pipe')
+parser.add_argument('--script', required=True, type=str,
+                    help='the script that is going to perform the decrypt')
+args = parser.parse_args()
+
 # get the process
 device = frida.get_usb_device()
 target = device.get_frontmost_application()
@@ -32,13 +39,12 @@ for process in processes:
     if target.pid is not None and process.pid != target.pid:
         continue
 
-    logging.info("[decoder]: found target [{}] {}".format(
+    logging.info("[piper]: found target [{}] {}".format(
         process.pid, process.name))
-
 
 session = device.attach(process.pid)
 
-with open('piper.js') as f:
+with open(args.script) as f:
     script = session.create_script(f.read())
 
 script.on('message', on_message)
